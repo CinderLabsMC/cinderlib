@@ -1,8 +1,7 @@
 package net.cinderlabsmc.cinderlib.client.gui.element;
 
 import net.cinderlabsmc.cinderlib.client.gui.render.Bounds;
-import net.cinderlabsmc.cinderlib.client.gui.render.GuiPainter;
-import net.cinderlabsmc.cinderlib.client.gui.render.GuiTheme;
+import net.cinderlabsmc.cinderlib.client.gui.theme.ICinderTheme;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
@@ -11,12 +10,12 @@ import java.util.List;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-public record ProgressBar(Bounds bounds, LongSupplier value, LongSupplier max, int color, BarDirection direction, Supplier<List<Component>> tooltip) implements IGuiElement {
+public record ProgressBar(ICinderTheme theme, Bounds bounds, LongSupplier value, LongSupplier max, int color, BarDirection direction, Supplier<List<Component>> tooltip) implements IGuiElement {
 
     @Override
     public void render(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
-        GuiPainter.fill(graphics, bounds, GuiTheme.BAR_BACKGROUND);
-        GuiPainter.fill(graphics, filled(), color);
+        fill(graphics, bounds, theme.barBackground());
+        fill(graphics, filled(), color);
     }
 
     @Override
@@ -36,6 +35,10 @@ public record ProgressBar(Bounds bounds, LongSupplier value, LongSupplier max, i
             }
             case RIGHT -> bounds.withSize(scale(bounds.width()), bounds.height());
         };
+    }
+
+    private static void fill(GuiGraphicsExtractor graphics, Bounds area, int fillColor) {
+        graphics.fill(area.left(), area.top(), area.right(), area.bottom(), fillColor);
     }
 
     private int scale(int size) {

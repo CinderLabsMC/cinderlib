@@ -2,7 +2,10 @@ package net.cinderlabsmc.cinderlib.client.gui.widget;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.cinderlabsmc.cinderlib.CinderLib;
+import net.cinderlabsmc.cinderlib.client.gui.render.Bounds;
+import net.cinderlabsmc.cinderlib.client.gui.theme.ICinderTheme;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -16,9 +19,15 @@ public final class SearchField extends EditBox {
     private static final Component HINT = Component.translatable("gui." + CinderLib.MOD_ID + ".search");
     private static final String EMPTY = "";
     private static final int MAX_LENGTH = 256;
+    private static final int PADDING_LEFT = 3;
+    private static final int PADDING_TOP = 2;
 
-    public SearchField(@NonNull Font font, int left, int top, int width, int height, @NonNull Consumer<String> onChange) {
-        super(font, left, top, width, height, HINT);
+    private final ICinderTheme theme;
+
+    public SearchField(@NonNull Font font, @NonNull Bounds bounds, @NonNull ICinderTheme theme, @NonNull Consumer<String> onChange) {
+        super(font, bounds.left() + PADDING_LEFT, bounds.top() + PADDING_TOP, bounds.width() - 2 * PADDING_LEFT, bounds.height() - PADDING_TOP, HINT);
+        this.theme = theme;
+        setBordered(false);
         setHint(HINT);
         setMaxLength(MAX_LENGTH);
         setResponder(onChange);
@@ -26,6 +35,12 @@ public final class SearchField extends EditBox {
 
     public void clear() {
         setValue(EMPTY);
+    }
+
+    @Override
+    public void extractWidgetRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        theme.inset(graphics, new Bounds(getX() - PADDING_LEFT, getY() - PADDING_TOP, width + 2 * PADDING_LEFT, height + PADDING_TOP));
+        super.extractWidgetRenderState(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override

@@ -1,8 +1,7 @@
 package net.cinderlabsmc.cinderlib.client.gui.widget;
 
 import net.cinderlabsmc.cinderlib.client.gui.render.Bounds;
-import net.cinderlabsmc.cinderlib.client.gui.render.GuiPainter;
-import net.cinderlabsmc.cinderlib.client.gui.render.GuiTheme;
+import net.cinderlabsmc.cinderlib.client.gui.theme.ICinderTheme;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -13,16 +12,20 @@ import org.jspecify.annotations.NonNull;
 
 public final class Scrollbar extends AbstractWidget {
 
-    public static final int WIDTH = 12;
+    public static final int WIDTH = 14;
 
+    private static final int HANDLE_WIDTH = 12;
     private static final int HANDLE_HEIGHT = 15;
-    private static final int HANDLE_INSET = 1;
+    private static final int INSET = 1;
+
+    private final ICinderTheme theme;
 
     private int offset;
     private int maxOffset;
 
-    public Scrollbar(int left, int top, int height) {
+    public Scrollbar(int left, int top, int height, @NonNull ICinderTheme theme) {
         super(left, top, WIDTH, height, Component.empty());
+        this.theme = theme;
     }
 
     public int offset() {
@@ -40,12 +43,8 @@ public final class Scrollbar extends AbstractWidget {
 
     @Override
     protected void extractWidgetRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        GuiPainter.fill(graphics, new Bounds(getX(), getY(), width, height), GuiTheme.SLOT_DARK);
-
-        int color = maxOffset == 0 ? GuiTheme.SCROLL_HANDLE_DISABLED : GuiTheme.SCROLL_HANDLE;
-        var handle = new Bounds(getX() + HANDLE_INSET, handleTop(), width - 2 * HANDLE_INSET, HANDLE_HEIGHT);
-
-        GuiPainter.fill(graphics, handle, color);
+        theme.inset(graphics, new Bounds(getX(), getY(), width, height));
+        theme.scrollHandle(graphics, new Bounds(getX() + INSET, handleTop(), HANDLE_WIDTH, HANDLE_HEIGHT), maxOffset > 0);
     }
 
     @Override
@@ -60,6 +59,10 @@ public final class Scrollbar extends AbstractWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (scrollY == 0) {
+            return false;
+        }
+
         scroll((int) -Math.signum(scrollY));
         return true;
     }
@@ -81,17 +84,20 @@ public final class Scrollbar extends AbstractWidget {
             return;
         }
 
-        double travel = height - HANDLE_HEIGHT;
-        double ratio = (mouseY - getY() - HANDLE_HEIGHT / 2.0) / travel;
+        double ratio = (mouseY - getY() - INSET - HANDLE_HEIGHT / 2.0) / travel();
 
         setOffset((int) Math.round(ratio * maxOffset));
     }
 
     private int handleTop() {
         if (maxOffset == 0) {
-            return getY();
+            return getY() + INSET;
         }
 
-        return getY() + (height - HANDLE_HEIGHT) * offset / maxOffset;
+        return getY() + INSET + travel() * offset / maxOffset;
+    }
+
+    private int travel() {
+        return height - 2 * INSET - HANDLE_HEIGHT;
     }
 }

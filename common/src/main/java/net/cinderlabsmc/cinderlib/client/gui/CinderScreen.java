@@ -3,7 +3,8 @@ package net.cinderlabsmc.cinderlib.client.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.cinderlabsmc.cinderlib.client.gui.element.IGuiElement;
 import net.cinderlabsmc.cinderlib.client.gui.render.Bounds;
-import net.cinderlabsmc.cinderlib.client.gui.render.GuiPainter;
+import net.cinderlabsmc.cinderlib.client.gui.theme.ICinderTheme;
+import net.cinderlabsmc.cinderlib.client.gui.theme.VanillaTheme;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
@@ -27,20 +28,26 @@ public abstract class CinderScreen<Menu extends AbstractContainerMenu> extends A
 
     protected abstract void build(@NonNull CinderLayout layout);
 
+    protected @NonNull ICinderTheme theme() {
+        return VanillaTheme.INSTANCE;
+    }
+
     @Override
     protected void init() {
         super.init();
         elements.clear();
-        build(new CinderLayout(this, leftPos, topPos));
+        build(new CinderLayout(this, theme(), leftPos, topPos));
     }
 
     @Override
     public void extractBackground(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractBackground(graphics, mouseX, mouseY, partialTick);
-        GuiPainter.panel(graphics, new Bounds(leftPos, topPos, imageWidth, imageHeight));
+        var theme = theme();
+
+        theme.panel(graphics, new Bounds(leftPos, topPos, imageWidth, imageHeight));
 
         for (var slot : menu.slots) {
-            GuiPainter.slot(graphics, leftPos + slot.x, topPos + slot.y);
+            theme.slot(graphics, leftPos + slot.x, topPos + slot.y);
         }
 
         for (var element : elements) {
@@ -66,6 +73,23 @@ public abstract class CinderScreen<Menu extends AbstractContainerMenu> extends A
             graphics.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
             return;
         }
+    }
+
+    @Override
+    protected void extractLabels(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        int color = theme().textColor();
+
+        graphics.text(font, title, titleLabelX, titleLabelY, color, false);
+        graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, color, false);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
+            return true;
+        }
+
+        return getChildAt(mouseX, mouseY).filter(child -> child.mouseScrolled(mouseX, mouseY, scrollX, scrollY)).isPresent();
     }
 
     @Override

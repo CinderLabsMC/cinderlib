@@ -5,13 +5,12 @@ import net.cinderlabsmc.cinderlib.client.gui.element.IGuiElement;
 import net.cinderlabsmc.cinderlib.client.gui.element.Label;
 import net.cinderlabsmc.cinderlib.client.gui.element.ProgressBar;
 import net.cinderlabsmc.cinderlib.client.gui.render.Bounds;
-import net.cinderlabsmc.cinderlib.client.gui.render.GuiTheme;
+import net.cinderlabsmc.cinderlib.client.gui.theme.ICinderTheme;
 import net.cinderlabsmc.cinderlib.client.gui.widget.Scrollbar;
 import net.cinderlabsmc.cinderlib.client.gui.widget.SearchField;
+import net.cinderlabsmc.cinderlib.client.gui.widget.TextButton;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -26,11 +25,13 @@ import java.util.function.Supplier;
 public final class CinderLayout {
 
     private final CinderScreen<?> screen;
+    private final ICinderTheme theme;
     private final int originLeft;
     private final int originTop;
 
-    CinderLayout(@NonNull CinderScreen<?> screen, int originLeft, int originTop) {
+    CinderLayout(@NonNull CinderScreen<?> screen, @NonNull ICinderTheme theme, int originLeft, int originTop) {
         this.screen = screen;
+        this.theme = theme;
         this.originLeft = originLeft;
         this.originTop = originTop;
     }
@@ -39,12 +40,16 @@ public final class CinderLayout {
         return screen.getFont();
     }
 
+    public @NonNull ICinderTheme theme() {
+        return theme;
+    }
+
     public void label(int left, int top, @NonNull Component text) {
         label(left, top, () -> text);
     }
 
     public void label(int left, int top, @NonNull Supplier<Component> text) {
-        element(new Label(font(), originLeft + left, originTop + top, text, GuiTheme.TEXT));
+        element(new Label(font(), originLeft + left, originTop + top, text, theme.textColor()));
     }
 
     public void bar(@NonNull Bounds bounds, @NonNull LongSupplier value, @NonNull LongSupplier max, int color, @NonNull BarDirection direction) {
@@ -52,16 +57,14 @@ public final class CinderLayout {
     }
 
     public void bar(@NonNull Bounds bounds, @NonNull LongSupplier value, @NonNull LongSupplier max, int color, @NonNull BarDirection direction, @NonNull Supplier<List<Component>> tooltip) {
-        element(new ProgressBar(absolute(bounds), value, max, color, direction, tooltip));
+        element(new ProgressBar(theme, absolute(bounds), value, max, color, direction, tooltip));
     }
 
-    public @NonNull Button button(@NonNull Bounds bounds, @NonNull Component text, @NonNull Runnable action) {
-        var target = absolute(bounds);
-
-        return screen.addCinderWidget(Button.builder(text, _ -> action.run()).bounds(target.left(), target.top(), target.width(), target.height()).build());
+    public @NonNull TextButton<Component> button(@NonNull Bounds bounds, @NonNull Component text, @NonNull Runnable action) {
+        return cycle(bounds, List.of(text), text, Function.identity(), _ -> action.run());
     }
 
-    public @NonNull Button button(@NonNull Bounds bounds, @NonNull Component text, @NonNull Component tooltip, @NonNull Runnable action) {
+    public @NonNull TextButton<Component> button(@NonNull Bounds bounds, @NonNull Component text, @NonNull Component tooltip, @NonNull Runnable action) {
         var button = button(bounds, text, action);
 
         button.setTooltip(Tooltip.create(tooltip));
@@ -69,28 +72,24 @@ public final class CinderLayout {
         return button;
     }
 
-    public @NonNull CycleButton<Boolean> toggle(@NonNull Bounds bounds, @NonNull Component text, boolean initial, @NonNull Consumer<Boolean> onChange) {
-        var target = absolute(bounds);
-        var toggle = CycleButton.booleanBuilder(CommonComponents.OPTION_ON, CommonComponents.OPTION_OFF, initial).create(target.left(), target.top(), target.width(), target.height(), text, (_, value) -> onChange.accept(value));
-
-        return screen.addCinderWidget(toggle);
+    public @NonNull TextButton<Boolean> toggle(@NonNull Bounds bounds, @NonNull Component text, boolean initial, @NonNull Consumer<Boolean> onChange) {
+        return cycle(bounds, List.of(false, true), initial, enabled -> CommonComponents.optionStatus(text, enabled), onChange);
     }
 
-    public <Value> @NonNull CycleButton<Value> cycle(@NonNull Bounds bounds, @NonNull List<Value> values, @NonNull Value initial, @NonNull Function<Value, Component> names, @NonNull Consumer<Value> onChange) {
-        var target = absolute(bounds);
-        var cycle = CycleButton.builder(names, initial).withValues(values).displayOnlyValue().create(target.left(), target.top(), target.width(), target.height(), Component.empty(), (_, value) -> onChange.accept(value));
-
-        return screen.addCinderWidget(cycle);
+    public <Value> @NonNull TextButton<Value> cycle(@NonNull Bounds bounds, @NonNull List<Value> values, @NonNull Value initial, @NonNull Function<Value, Component> names, @NonNull Consumer<Value> onChange) {
+        return screen.addCinderWidget(new TextButton<>(absolute(bounds), theme, values, initial, names, onChange));
     }
 
     public @NonNull SearchField search(@NonNull Bounds bounds, @NonNull Consumer<String> onChange) {
-        var target = absolute(bounds);
+        return screen.addCinderWidget(new SearchField(font(), absolute(bounds), theme, onChange));
+    }
 
-        return screen.addCinderWidget(new SearchField(font(), target.left(), target.top(), target.width(), target.height(), onChange));
+    public @NonNull Toolbar toolbar(int left, int top) {
+        return new Toolbar(this, left, top);
     }
 
     public @NonNull Scrollbar scrollbar(int left, int top, int height) {
-        return screen.addCinderWidget(new Scrollbar(originLeft + left, originTop + top, height));
+        return screen.addCinderWidget(new Scrollbar(originLeft + left, originTop + top, height, theme));
     }
 
     public <Widget extends AbstractWidget> @NonNull Widget widget(int left, int top, @NonNull Widget widget) {
