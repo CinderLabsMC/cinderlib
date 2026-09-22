@@ -1,3 +1,4 @@
 {
-  "cinderlib.mod_name": "CinderLib"
+  "cinderlib.mod_name": "CinderLib",
+  "gui.cinderlib.search": "Search..."
 }
