@@ -20,3 +20,13 @@ tasks.processResources {
 tasks.jar {
     from project(':common').sourceSets.main.output.classesDirs
 }
+
+tasks.withType(GenerateModuleMetadata).configureEach {
+    enabled = false
+}
+
+publishing.publications.mavenJava.pom.withXml {
+    asNode().dependencies.dependency
+            .findAll { it.artifactId.text() == "${mod_id}-common" }
+            .each { it.parent().remove(it) }
+}

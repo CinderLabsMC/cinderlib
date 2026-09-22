@@ -1,26 +1,18 @@
 package net.cinderlabsmc.cinderlib;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 
-public final class CinderLibPlatform {
+/**
+ * Loader-specific functionality, implemented once per platform and loaded via {@link java.util.ServiceLoader}
+ * ({@code META-INF/services/net.cinderlabsmc.cinderlib.CinderLibPlatform}).
+ */
+public interface CinderLibPlatform {
 
-    private CinderLibPlatform() {
-    }
+    @NonNull String getPlatformName();
 
-    @ExpectPlatform
-    public static String getPlatformName() {
-        throw new AssertionError("Platform implementation was not injected");
-    }
+    boolean isModLoaded(@NonNull String modId);
 
-    @ExpectPlatform
-    public static boolean isModLoaded(String modId) {
-        throw new AssertionError("Platform implementation was not injected");
-    }
-
-    @ExpectPlatform
-    public static Path getConfigDirectory() {
-        throw new AssertionError("Platform implementation was not injected");
-    }
+    @NonNull Path getConfigDirectory();
 }

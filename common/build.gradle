@@ -7,7 +7,6 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     api "dev.architectury:architectury:${architectury_api_version}"
-    compileOnly "dev.architectury:architectury-injectables:${architectury_injectables_version}"
     api "com.geckolib:geckolib-common-${minecraft_version}:${geckolib_version}"
 }
 

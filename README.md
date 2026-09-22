@@ -17,7 +17,7 @@ The shared API currently provides:
 
 - `CinderLib.isModLoaded(String)` for optional integrations.
 - `CinderLib.getConfigDirectory()` for platform-neutral config paths.
-- `CinderLibPlatform` as the small extension point for further loader differences.
+- `CinderLibPlatform` (via `CinderLib.platform()`) as the small extension point for further loader differences, implemented per loader and loaded with `ServiceLoader`.
 
 ## CinderBlock
 

@@ -2,22 +2,26 @@ package net.cinderlib.fabric;
 
 import net.cinderlabsmc.cinderlib.CinderLibPlatform;
 import net.fabricmc.loader.api.FabricLoader;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 
 /**
  * The Fabric-side implementation of {@link CinderLibPlatform}.
  */
-public class CinderLibPlatformImpl {
-    public static String getPlatformName() {
+public class CinderLibPlatformImpl implements CinderLibPlatform {
+    @Override
+    public @NonNull String getPlatformName() {
         return "Fabric";
     }
 
-    public static boolean isModLoaded(String modId) {
+    @Override
+    public boolean isModLoaded(@NonNull String modId) {
         return FabricLoader.getInstance().isModLoaded(modId);
     }
 
-    public static Path getConfigDirectory() {
+    @Override
+    public @NonNull Path getConfigDirectory() {
         return FabricLoader.getInstance().getConfigDir();
     }
 }

@@ -1,5 +1,6 @@
 subprojects {
     apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
 
     group = mod_group
     version = mod_version
@@ -29,5 +30,14 @@ subprojects {
                      minecraft_version: minecraft_version]
         inputs.properties(props)
         filesMatching(['fabric.mod.json', 'META-INF/neoforge.mods.toml']) { expand props }
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = base.archivesName.get()
+                from components.java
+            }
+        }
     }
 }
