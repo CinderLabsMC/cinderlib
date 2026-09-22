@@ -2,17 +2,17 @@ plugins {
     id 'net.fabricmc.fabric-loom' version "${fabric_loom_version}"
 }
 
-// von :neoforge:runData erzeugte Daten (Rezepte, Loot-Tables) werden ins normale Resources-Set aufgenommen
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    api "com.geckolib:geckolib-common-${minecraft_version}:${geckolib_version}"
-    api "me.shedaniel.cloth:cloth-config:${cloth_config_version}"
-    // Optionale Integrationen: nur zum Kompilieren (Jade-API steckt im Jade-Jar, JEI hat ein eigenes Common-API-Artefakt)
-    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
-    compileOnly "maven.modrinth:jade:${jade_version}+fabric"
-
     api "dev.architectury:architectury:${architectury_api_version}"
+    compileOnly "dev.architectury:architectury-injectables:${architectury_injectables_version}"
+    api "com.geckolib:geckolib-common-${minecraft_version}:${geckolib_version}"
+}
+
+sourceSets {
+    example {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+    }
 }

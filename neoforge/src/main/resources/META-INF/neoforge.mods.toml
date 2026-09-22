@@ -13,20 +13,20 @@ authors = "ezTxmMC"
 [[dependencies.cinderlib]]
     modId = "neoforge"
     type = "required"
-    versionRange = "[26.1.2,)"
+    versionRange = "[26.3,)"
     ordering = "NONE"
     side = "BOTH"
 
 [[dependencies.cinderlib]]
     modId = "minecraft"
     type = "required"
-    versionRange = "[26.1.2,)"
+    versionRange = "[26.3,)"
     ordering = "NONE"
     side = "BOTH"
 
 [[dependencies.cinderlib]]
     modId = "architectury"
     type = "required"
-    versionRange = "[20.1.15,)"
+    versionRange = "[22.0.2,)"
     ordering = "AFTER"
     side = "BOTH"

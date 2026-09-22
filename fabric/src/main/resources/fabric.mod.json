@@ -18,8 +18,7 @@
   },
   "depends": {
     "fabricloader": ">=0.19.5",
-    "fabric": "*",
-    "minecraft": "26.1.2",
-    "architectury": ">=20.1.15"
+    "minecraft": "26.3",
+    "architectury": ">=22.0.2"
   }
 }

@@ -8,7 +8,6 @@ neoForge {
     runs {
         client { client() }
         server { server() }
-        // ./gradlew :neoforge:runData -> schreibt Rezepte/Loot nach common/src/generated/resources
         data {
             serverData()
             programArguments.addAll '--mod', mod_id, '--all',
@@ -27,12 +26,6 @@ neoForge {
 
 dependencies {
     implementation "dev.architectury:architectury-neoforge:${architectury_api_version}"
-    implementation "com.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
-    implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
-    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
-    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
-    compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
-    runtimeOnly "maven.modrinth:jade:${jade_version}+neoforge"
     compileOnly project(':common')
 }
 
