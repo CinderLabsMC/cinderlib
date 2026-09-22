@@ -9,7 +9,7 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>Default asset paths for block {@code mod:name}:
  * <ul>
- *     <li>model: {@code assets/mod/geckolib/models/block/name.geo.json}</li>
+ *     <li>model: {@code assets/mod/geckolib/models/block/name.geo.json} (also used for the item unless {@link #itemModel(Identifier)} is set)</li>
  *     <li>animation: {@code assets/mod/geckolib/animations/block/name.animation.json} (only needed with controllers)</li>
  *     <li>texture: {@code assets/mod/textures/block/name.png}</li>
  * </ul>
@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 public final class CinderGeo {
 
     private Identifier model;
+    private @Nullable Identifier itemModel;
     private Identifier texture;
     private Identifier animation;
     private @Nullable String idleAnimation;
@@ -36,6 +37,12 @@ public final class CinderGeo {
     /** Model id, e.g. {@code mod:block/rack_shelf} for {@code geckolib/models/block/rack_shelf.geo.json}. */
     public @NonNull CinderGeo model(@NonNull Identifier model) {
         this.model = model;
+        return this;
+    }
+
+    /** Separate model for the block item; defaults to {@link #model(Identifier)}. */
+    public @NonNull CinderGeo itemModel(@NonNull Identifier itemModel) {
+        this.itemModel = itemModel;
         return this;
     }
 
@@ -65,6 +72,10 @@ public final class CinderGeo {
 
     public @NonNull Identifier model() {
         return model;
+    }
+
+    public @NonNull Identifier itemModel() {
+        return itemModel != null ? itemModel : model;
     }
 
     public @NonNull Identifier texture() {

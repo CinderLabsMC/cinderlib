@@ -25,7 +25,7 @@ public final class CinderGeoClient {
 
     public static @NonNull GeoItemRenderer<CinderGeoBlockItem> createItemRenderer(@NonNull CinderGeoBlockItem item) {
         var geo = item.geo();
-        return new CinderGeoItemRenderer<>(new CinderGeoModel<>(geo.model(), geo.texture(), geo.animation()));
+        return new CinderGeoItemRenderer<>(new CinderGeoModel<>(geo.itemModel(), geo.texture(), geo.animation()));
     }
 
     static void applyBones(CinderBones bones, BoneSnapshots snapshots) {
