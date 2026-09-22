@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "cinderlib",
+  "version": "${version}",
+  "name": "CinderLib",
+  "description": "CinderLib mod.",
+  "authors": [
+    "ezTxmMC"
+  ],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/cinderlib/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.cinderlib.fabric.CinderLibFabric"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "fabric": "*",
+    "minecraft": "26.1.2",
+    "architectury": ">=20.1.15"
+  }
+}
