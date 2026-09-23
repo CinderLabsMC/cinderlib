@@ -68,6 +68,88 @@ GeckoLib assets for `mod:name` (overridable via `.geo(g -> g.model(..).texture(.
 
 GeckoLib must be installed at runtime (`geckolib-fabric` / `geckolib-neoforge`) for `.geo()` blocks; other blocks don't load GeckoLib classes.
 
+## CinderArmor
+
+One class per armor set; every setting is an overridable method (only `material()` is required).
+
+```java
+public final class EmberArmor extends CinderArmor {
+    private static final CinderArmorMaterial MATERIAL = CinderArmorMaterial.create()
+            .durability(37).defense(3, 6, 8, 3).enchantability(15).toughness(1f)
+            .equipSound(SoundEvents.ARMOR_EQUIP_NETHERITE);
+
+    public EmberArmor() { super("ember"); }
+
+    @Override public CinderArmorMaterial material() { return MATERIAL; }
+    @Override public @Nullable String variant(EquipmentSlot slot) { return slot == EquipmentSlot.LEGS ? "legs" : null; }
+    @Override public @Nullable String idleAnimation(EquipmentSlot slot) { return "animation.ember.idle"; }
+    @Override public float scaleWidth() { return 1.05f; }
+}
+
+public static final EmberArmor EMBER = CinderArmor.register(REGISTRAR, new EmberArmor()); // ember_helmet, _chestplate, _leggings, _boots
+```
+
+Other hooks: `slots()` (subset of pieces), `model/texture(slot)`, `animation()`, `parts(slot)`, `bone(part)`,
+`scaleHeight()`, `translucent()`, `tint(stack)`, `adjustBones(stack, slot, bones)` (per wearer, client),
+`properties(slot, props)`, `createItem(type, props)` (custom `CinderArmorItem` subclass with own controllers).
+
+Assets for `mod:name`: `geckolib/models/armor/name.geo.json`, `geckolib/animations/armor/name.animation.json`,
+`textures/armor/name.png` (a slot `variant` adds `_variant`), plus `equipment/name.json` for the equipment asset.
+Default bones: `armorHead`, `armorBody`, `armorLeftArm`, `armorRightArm`, `armorLeftLeg`, `armorRightLeg`,
+`armorLeftBoot`, `armorRightBoot`.
+
+## CinderItem and CinderTab
+
+```java
+public static final RegistrySupplier<Item> RUBY = CinderItem.builder(REGISTRAR, "ruby")
+        .rarity(Rarity.RARE)   // also stacksTo, fireResistant, properties(..), factory(MyItem::new)
+        .register();
+
+public static final CinderTab TAB = CinderTab.create(REGISTRAR, "main", RUBY).add(RUBY); // itemGroup.mod.main
+```
+
+`CinderItem.tab(tab)` adds an item to a tab directly when the tab is created first.
+
+## CinderDataGen
+
+Loader independent: collects assets and data in memory and writes plain JSON, without the Fabric or NeoForge
+datagen APIs. Output goes to `common/src/generated/resources`, which `common` already includes.
+
+```java
+public static void main(String[] args) {
+    ExampleMod.define(); // create the content without registering it
+    CinderDataGen.create("mymod")
+            .blocks(REGISTRAR)                 // state, model, item, loot and name of every plain block
+            .item("ruby")                      // generated item model, definition and name
+            .lang("itemGroup.mymod.main", "My Mod")
+            .shapeless("ruby_from_marble", "mymod:ruby", 2, "mymod:marble")
+            .itemTag("gems", "mymod:ruby")
+            .apply(ExampleWorldgen::generate)
+            .run(Path.of("common/src/generated/resources"));
+}
+```
+
+Also available: `cubeBlock`, `selfDrop`, `shaped`, `blockTag`, and raw `asset(path, json)` / `data(path, json)`.
+Blocks with facing, extra properties or GeckoLib only get a name and a loot table; their models stay hand-written.
+
+## Worldgen
+
+`CinderOre` generates a configured feature, a placed feature and a NeoForge biome modifier:
+
+```java
+CinderOre.of("ruby_ore").block("mymod:ruby_ore").deepslate("mymod:deepslate_ruby_ore")
+        .size(6).count(4).height(-64, 16).hideFromAir(0.5f).biomes("#minecraft:is_overworld");
+```
+
+Fabric has no data driven biome modifiers; add the placed feature there in code with
+`BiomeModifications.addFeature(...)`.
+
+## Examples
+
+`common/src/example/` contains a working setup: `ExampleMod` (entry point, `init()` / `define()`), `ExampleBlocks`,
+`ExampleItems`, `ExampleArmors` (`PlainArmor`, `EmberArmor`, `GhostArmor`), `ExampleWorldgen` and `ExampleDataGen`.
+Call `ExampleMod.init()` from the loader entrypoint to use it. Textures, models and equipment assets are not included.
+
 ## Building
 
 ```sh
