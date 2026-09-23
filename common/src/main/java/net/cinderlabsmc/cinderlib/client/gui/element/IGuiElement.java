@@ -1,16 +1,17 @@
 package net.cinderlabsmc.cinderlib.client.gui.element;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.network.chat.Component;
+import java.util.List;
+
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 
 public interface IGuiElement {
 
-    void render(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY);
+  void render(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY);
 
-    default @NonNull List<Component> tooltip(int mouseX, int mouseY) {
-        return List.of();
-    }
+  default @NonNull List<Component> tooltip(int mouseX, int mouseY) {
+    return List.of();
+  }
 }
